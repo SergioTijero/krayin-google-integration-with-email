@@ -17,13 +17,16 @@ class Account extends Model implements AccountContract
     protected $fillable = [
         'google_id',
         'name',
+        'email',
         'token',
         'scopes',
+        'gmail_last_sync_at',
     ];
 
     protected $casts = [
-        'token'  => 'json',
-        'scopes' => 'json',
+        'token'               => 'json',
+        'scopes'              => 'json',
+        'gmail_last_sync_at'  => 'datetime',
     ];
 
     /**
@@ -43,6 +46,14 @@ class Account extends Model implements AccountContract
     }
 
     /**
+     * Get the Gmail messages.
+     */
+    public function gmailMessages()
+    {
+        return $this->hasMany(GmailMessageProxy::modelClass(), 'account_id');
+    }
+
+    /**
      * Synchronize calendars.
      */
     public function synchronize()
@@ -53,5 +64,34 @@ class Account extends Model implements AccountContract
     public function watch()
     {
         WatchCalendars::dispatch($this);
+    }
+
+    /**
+     * Check if the account has Gmail permissions.
+     */
+    public function hasGmailPermissions(): bool
+    {
+        $requiredScopes = [
+            'https://www.googleapis.com/auth/gmail.readonly',
+            'https://www.googleapis.com/auth/gmail.send',
+        ];
+
+        $accountScopes = $this->scopes ?? [];
+
+        foreach ($requiredScopes as $scope) {
+            if (!in_array($scope, $accountScopes)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Get unread Gmail messages count.
+     */
+    public function getUnreadGmailCount(): int
+    {
+        return $this->gmailMessages()->unread()->count();
     }
 }

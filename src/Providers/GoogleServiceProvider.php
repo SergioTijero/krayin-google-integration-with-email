@@ -70,6 +70,14 @@ class GoogleServiceProvider extends ServiceProvider
         $this->app->concord->registerModel(
             \Webkul\User\Contracts\User::class, \Webkul\Google\Models\User::class
         );
+
+        $this->app->concord->registerModel(
+            \Webkul\Google\Contracts\GmailMessage::class, \Webkul\Google\Models\GmailMessage::class
+        );
+
+        $this->app->concord->registerModel(
+            \Webkul\Google\Contracts\GmailAttachment::class, \Webkul\Google\Models\GmailAttachment::class
+        );
     }
 
     /**

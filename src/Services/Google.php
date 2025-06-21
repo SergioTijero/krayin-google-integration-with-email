@@ -15,6 +15,13 @@ class Google
     protected $client;
 
     /**
+     * Gmail service instance
+     *
+     * @var \Google_Service_Gmail|null
+     */
+    protected $gmailService;
+
+    /**
      * Google service constructor.
      *
      * @return void
@@ -101,5 +108,114 @@ class Google
             default:
                 throw new \Exception('Invalid Synchronizable');
         }
+    }
+
+    /**
+     * Get Gmail service instance
+     */
+    public function gmail(): \Google_Service_Gmail
+    {
+        if (!$this->gmailService) {
+            $this->gmailService = new \Google_Service_Gmail($this->client);
+        }
+
+        return $this->gmailService;
+    }
+
+    /**
+     * Send email via Gmail API
+     */
+    public function sendEmail(array $emailData): \Google_Service_Gmail_Message
+    {
+        $gmail = $this->gmail();
+        
+        $message = new \Google_Service_Gmail_Message();
+        $message->setRaw($this->createRawMessage($emailData));
+
+        return $gmail->users_messages->send('me', $message);
+    }
+
+    /**
+     * Get Gmail messages with optional query
+     */
+    public function getMessages(array $options = []): \Google_Service_Gmail_ListMessagesResponse
+    {
+        $gmail = $this->gmail();
+        
+        $params = [
+            'maxResults' => $options['maxResults'] ?? 100,
+        ];
+
+        if (isset($options['q'])) {
+            $params['q'] = $options['q'];
+        }
+
+        if (isset($options['pageToken'])) {
+            $params['pageToken'] = $options['pageToken'];
+        }
+
+        return $gmail->users_messages->listUsersMessages('me', $params);
+    }
+
+    /**
+     * Get Gmail message by ID
+     */
+    public function getMessage(string $messageId): \Google_Service_Gmail_Message
+    {
+        $gmail = $this->gmail();
+        
+        return $gmail->users_messages->get('me', $messageId, ['format' => 'full']);
+    }
+
+    /**
+     * Get Gmail labels
+     */
+    public function getLabels(): \Google_Service_Gmail_ListLabelsResponse
+    {
+        $gmail = $this->gmail();
+        
+        return $gmail->users_labels->listUsersLabels('me');
+    }
+
+    /**
+     * Create raw message for Gmail API
+     */
+    protected function createRawMessage(array $emailData): string
+    {
+        $to = is_array($emailData['to']) ? implode(', ', $emailData['to']) : $emailData['to'];
+        $subject = $emailData['subject'] ?? '';
+        $body = $emailData['body'] ?? '';
+        $from = $emailData['from'] ?? config('mail.from.address');
+        
+        $headers = [];
+        $headers[] = "To: {$to}";
+        $headers[] = "From: {$from}";
+        $headers[] = "Subject: {$subject}";
+        $headers[] = "MIME-Version: 1.0";
+        $headers[] = "Content-Type: text/html; charset=utf-8";
+        $headers[] = "Content-Transfer-Encoding: base64";
+
+        if (isset($emailData['cc']) && !empty($emailData['cc'])) {
+            $cc = is_array($emailData['cc']) ? implode(', ', $emailData['cc']) : $emailData['cc'];
+            $headers[] = "Cc: {$cc}";
+        }
+
+        if (isset($emailData['bcc']) && !empty($emailData['bcc'])) {
+            $bcc = is_array($emailData['bcc']) ? implode(', ', $emailData['bcc']) : $emailData['bcc'];
+            $headers[] = "Bcc: {$bcc}";
+        }
+
+        $rawMessage = implode("\r\n", $headers) . "\r\n\r\n" . $body;
+        
+        return base64url_encode($rawMessage);
+    }
+}
+
+/**
+ * Helper function for base64url encoding required by Gmail API
+ */
+if (!function_exists('base64url_encode')) {
+    function base64url_encode($data) {
+        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
     }
 }

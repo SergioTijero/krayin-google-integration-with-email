@@ -1,6 +1,6 @@
 ### 1. Introduction:
 
-Krayin Google Integration.
+Krayin Google Integration with Email Support.
 
 It packs in lots of demanding features that allows your business to scale in no time:
 
@@ -9,6 +9,11 @@ It packs in lots of demanding features that allows your business to scale in no 
 * Support two-way synchronization for events
 * Support real time event synchronization
 * User can create google meet link directly from activity form
+* **NEW: Complete Gmail integration for email management**
+* **NEW: Send emails via Gmail API (bypass SMTP restrictions)**
+* **NEW: Receive and manage emails directly in Krayin CRM**
+* **NEW: Two-way email synchronization with Gmail**
+* **NEW: Email attachment support**
 
 
 ### 2. Requirements:
@@ -109,6 +114,12 @@ return [
             
             // Managing the user's calendars and events.
             \Google_Service_Calendar::CALENDAR,
+            
+            // Gmail API scopes for email management.
+            \Google_Service_Gmail::GMAIL_READONLY,  // Read emails
+            \Google_Service_Gmail::GMAIL_SEND,      // Send emails
+            \Google_Service_Gmail::GMAIL_COMPOSE,   // Compose emails
+            \Google_Service_Gmail::GMAIL_MODIFY,    // Modify email labels/status
         ],
         
         // Enables automatic token refresh.
@@ -137,6 +148,9 @@ protected function schedule(Schedule $schedule)
 {
     $schedule->job(new \Webkul\Google\Jobs\PeriodicSynchronizations())->everyFifteenMinutes();
     $schedule->job(new \Webkul\Google\Jobs\RefreshWebhookSynchronizations())->daily();
+    
+    // Gmail synchronization - sync emails every 5 minutes for active accounts
+    $schedule->job(new \Webkul\Google\Jobs\PeriodicGmailSync())->everyFiveMinutes();
 }
 ```
 
@@ -146,6 +160,36 @@ php artisan cache:clear
 
 php artisan config:cache
 ~~~
+
+### 6. Gmail Setup:
+
+The integration now includes full Gmail support! This allows you to:
+
+- **Send emails via Gmail API**: Bypass SMTP port restrictions by using Gmail's API
+- **Receive emails**: Sync emails from Gmail directly into Krayin
+- **Manage emails**: Read, reply, forward, and organize emails from within Krayin
+- **Attachment support**: Download and manage email attachments
+- **Two-way sync**: Changes made in Gmail are reflected in Krayin and vice versa
+
+**Gmail Features Available:**
+- Compose and send emails
+- Reply to emails
+- Forward emails
+- Mark emails as read/unread
+- Organize emails by labels (Inbox, Sent, Drafts, Trash, etc.)
+- Search emails
+- Download attachments
+- Real-time email synchronization
+
+**Gmail API Setup:**
+1. In your Google Cloud Console, make sure to enable the Gmail API
+2. Update your OAuth 2.0 scopes to include Gmail permissions
+3. The integration will automatically sync emails every 5 minutes (configurable)
+
+**Accessing Gmail:**
+- Navigate to Admin > Google > Gmail
+- Or use the Gmail menu item in the admin panel
+- First-time setup will require re-authenticating with Google to grant Gmail permissions
 
 
 > That's it, now just execute the project on your specified domain.
