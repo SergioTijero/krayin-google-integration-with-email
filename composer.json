@@ -1,11 +1,15 @@
 {
-    "name": "krayin/krayin-google-integration",
-    "description": "Krayin Google Integration",
+    "name": "sergiotijero/krayin-google-integration-with-email",
+    "description": "Krayin Google Integration with Email",
     "license": "MIT",
     "authors": [
         {
             "name": "Jitendra Singh",
             "email": "jitendra@webkul.com"
+        },
+        {
+            "name": "Sergio Tijero",
+            "email": "contacto@sergiotijero.com"
         }
     ],
     "require": {
