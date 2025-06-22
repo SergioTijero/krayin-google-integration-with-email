@@ -58,6 +58,41 @@ php artisan config:cache
 php artisan route:cache
 ```
 
+### 5. Quick Installation Check
+
+Run this command to verify everything is installed correctly:
+
+```bash
+php artisan google:install
+```
+
+This command will:
+- Check if routes are registered
+- Publish configuration files
+- Clear caches
+- Verify menu registration
+
+### 6. Manual Menu Registration (If Needed)
+
+If you don't see "Google Integration" in your admin menu after installation, add this to your `app/Providers/AppServiceProvider.php`:
+
+```php
+public function boot()
+{
+    // ...existing code...
+    
+    // Register Google Integration menu
+    if (class_exists('\Webkul\Google\Providers\GoogleServiceProvider')) {
+        $this->mergeConfigFrom(
+            base_path('vendor/sergiotijero/krayin-google-integration-with-email/src/Config/menu.php'), 
+            'menu.admin'
+        );
+    }
+}
+```
+
+Or try accessing directly: `https://yourdomain.com/admin/google`
+
 ---
 
 ## ⚙️ **Configuration**

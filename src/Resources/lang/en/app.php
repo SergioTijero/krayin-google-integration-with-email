@@ -1,11 +1,17 @@
 <?php
 
 return [
-    'title'           => 'Google',
+    'title'           => 'Google Integration',
     'account-deleted' => 'Account removed successfully.',
     'account-synced'  => 'Account synced successfully.',
     'view'            => 'View',
     'sync'            => 'Sync',
+
+    'layouts' => [
+        'google' => 'Google Integration',
+        'accounts' => 'Google Accounts', 
+        'gmail' => 'Gmail Settings',
+    ],
 
     'activity' => [
         'google-meet'         => 'Google Meet',

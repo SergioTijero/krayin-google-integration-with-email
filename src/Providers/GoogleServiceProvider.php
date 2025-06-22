@@ -48,6 +48,16 @@ class GoogleServiceProvider extends ServiceProvider
         $this->app->register(ModuleServiceProvider::class);
 
         $this->registerGmailTransport();
+        
+        // Registrar configuraciones para menú y ACL
+        $this->registerConfig();
+        
+        // Registrar comandos
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                \Webkul\Google\Console\Commands\GoogleInstallCommand::class,
+            ]);
+        }
 
         $this->overridesModels();
     }
