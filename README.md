@@ -26,7 +26,7 @@ It packs in lots of demanding features that allows your business to scale in no 
 * Go to the root folder of **Krayin** and run the following command
 
 ~~~php
-composer require krayin/krayin-google-integration
+composer require sergiotijero/krayin-google-integration-with-email
 ~~~
 
 * Run these commands below to complete the setup
