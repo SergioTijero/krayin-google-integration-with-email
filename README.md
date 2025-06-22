@@ -161,35 +161,57 @@ php artisan cache:clear
 php artisan config:cache
 ~~~
 
-### 6. Gmail Setup:
+### 6. Gmail Integration Setup:
 
-The integration now includes full Gmail support! This allows you to:
+This integration provides **Gmail as a Mail Transport** for Krayin CRM, allowing you to:
 
-- **Send emails via Gmail API**: Bypass SMTP port restrictions by using Gmail's API
-- **Receive emails**: Sync emails from Gmail directly into Krayin
-- **Manage emails**: Read, reply, forward, and organize emails from within Krayin
-- **Attachment support**: Download and manage email attachments
-- **Two-way sync**: Changes made in Gmail are reflected in Krayin and vice versa
+- **Send emails via Gmail API**: Bypass SMTP port restrictions completely
+- **Use existing CRM email features**: All email templates, notifications, and functionality work automatically
+- **Leverage Gmail's reliability**: Better deliverability and no server port issues
 
-**Gmail Features Available:**
-- Compose and send emails
-- Reply to emails
-- Forward emails
-- Mark emails as read/unread
-- Organize emails by labels (Inbox, Sent, Drafts, Trash, etc.)
-- Search emails
-- Download attachments
-- Real-time email synchronization
+## 🚀 **Quick Setup (3 Steps):**
 
-**Gmail API Setup:**
-1. In your Google Cloud Console, make sure to enable the Gmail API
-2. Update your OAuth 2.0 scopes to include Gmail permissions
-3. The integration will automatically sync emails every 5 minutes (configurable)
+### Step 1: Configure Google Account
+1. Go to **Admin → Google Integration**
+2. Connect your Google account with Gmail permissions
+3. Enable Gmail for your account
 
-**Accessing Gmail:**
-- Navigate to Admin > Google > Gmail
-- Or use the Gmail menu item in the admin panel
-- First-time setup will require re-authenticating with Google to grant Gmail permissions
+### Step 2: Update .env Configuration
+```env
+# Change your mail configuration to use Gmail
+MAIL_MAILER=gmail
+MAIL_USERNAME=your-gmail-account@gmail.com
+```
 
+### Step 3: Test Configuration
+- Go to **Admin → Google → Gmail Configuration**
+- Send a test email to verify everything works
 
-> That's it, now just execute the project on your specified domain.
+## 🎯 **How It Works:**
+- **Seamless Integration**: Uses Laravel's native mail system
+- **No Code Changes**: All your existing email templates and notifications work
+- **Gmail API**: Sends emails through Gmail API instead of SMTP
+- **Smart Account Selection**: Automatically uses the configured Gmail account
+
+## 📧 **Gmail API Setup in Google Cloud Console:**
+
+1. **Enable Gmail API**: In Google Cloud Console, enable the Gmail API for your project
+2. **OAuth 2.0 Scopes**: Make sure your OAuth application includes these scopes:
+   - `https://www.googleapis.com/auth/gmail.send`
+   - `https://www.googleapis.com/auth/gmail.compose`
+3. **Test Domain**: Add your domain to authorized domains if needed
+
+## 🎯 **Benefits:**
+- **No SMTP Issues**: Completely bypasses server SMTP port restrictions
+- **Better Deliverability**: Gmail's servers ensure better email delivery
+- **Existing Features**: All CRM email features work automatically
+- **Easy Setup**: Just change your .env file and you're done!
+
+## 📋 **Troubleshooting:**
+- If emails don't send, check Gmail permissions in Google Integration
+- Verify your MAIL_USERNAME matches your connected Google account
+- Use the test email feature to verify configuration
+
+---
+
+> That's it! Your Krayin CRM now sends emails through Gmail API instead of SMTP.

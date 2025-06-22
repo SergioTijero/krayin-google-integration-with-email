@@ -20,13 +20,13 @@ class Account extends Model implements AccountContract
         'email',
         'token',
         'scopes',
-        'gmail_last_sync_at',
+        'gmail_enabled',
     ];
 
     protected $casts = [
-        'token'               => 'json',
-        'scopes'              => 'json',
-        'gmail_last_sync_at'  => 'datetime',
+        'token'         => 'json',
+        'scopes'        => 'json',
+        'gmail_enabled' => 'boolean',
     ];
 
     /**
@@ -43,14 +43,6 @@ class Account extends Model implements AccountContract
     public function calendars()
     {
         return $this->hasMany(CalendarProxy::modelClass(), 'google_account_id');
-    }
-
-    /**
-     * Get the Gmail messages.
-     */
-    public function gmailMessages()
-    {
-        return $this->hasMany(GmailMessageProxy::modelClass(), 'account_id');
     }
 
     /**
@@ -72,8 +64,8 @@ class Account extends Model implements AccountContract
     public function hasGmailPermissions(): bool
     {
         $requiredScopes = [
-            'https://www.googleapis.com/auth/gmail.readonly',
             'https://www.googleapis.com/auth/gmail.send',
+            'https://www.googleapis.com/auth/gmail.compose',
         ];
 
         $accountScopes = $this->scopes ?? [];
@@ -88,10 +80,18 @@ class Account extends Model implements AccountContract
     }
 
     /**
-     * Get unread Gmail messages count.
+     * Enable Gmail for this account.
      */
-    public function getUnreadGmailCount(): int
+    public function enableGmail(): void
     {
-        return $this->gmailMessages()->unread()->count();
+        $this->update(['gmail_enabled' => true]);
+    }
+
+    /**
+     * Disable Gmail for this account.
+     */
+    public function disableGmail(): void
+    {
+        $this->update(['gmail_enabled' => false]);
     }
 }

@@ -47,6 +47,8 @@ class GoogleServiceProvider extends ServiceProvider
 
         $this->app->register(ModuleServiceProvider::class);
 
+        $this->registerGmailTransport();
+
         $this->overridesModels();
     }
 
@@ -94,5 +96,48 @@ class GoogleServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(
             dirname(__DIR__).'/Config/acl.php', 'acl'
         );
+    }
+
+    /**
+     * Register Gmail transport with Laravel's mail system.
+     */
+    protected function registerGmailTransport(): void
+    {
+        $this->app->afterResolving('mail.manager', function ($mailManager) {
+            $mailManager->extend('gmail', function (array $config) {
+                $google = $this->app->make(\Webkul\Google\Services\Google::class);
+                
+                // Get the Google account for the user or use default
+                $account = $this->getGoogleAccount($config);
+                
+                if (!$account) {
+                    throw new \Exception('No Google account configured for Gmail transport');
+                }
+
+                return new \Webkul\Google\Mail\Transport\GmailTransport($google, $account);
+            });
+        });
+    }
+
+    /**
+     * Get the Google account to use for sending emails.
+     */
+    protected function getGoogleAccount(array $config)
+    {
+        // Try to get account by email if specified in config
+        if (!empty($config['username'])) {
+            $account = \Webkul\Google\Models\Account::where('email', $config['username'])->first();
+            if ($account && $account->gmail_enabled) {
+                return $account;
+            }
+        }
+
+        // Fallback to the first available account with Gmail permissions
+        return \Webkul\Google\Models\Account::whereNotNull('token')
+            ->where('gmail_enabled', true)
+            ->get()
+            ->first(function ($account) {
+                return $account->hasGmailPermissions();
+            });
     }
 }

@@ -24,17 +24,13 @@ Route::group([
 
         Route::post('create-link', [MeetController::class, 'createLink'])->name('admin.google.meet.create_link');
 
-        // Gmail Routes
+        // Gmail Configuration Routes
         Route::group(['prefix' => 'gmail'], function () {
             Route::controller(GmailController::class)->group(function () {
                 Route::get('/', 'index')->name('admin.google.gmail.index');
-                Route::get('/compose', 'compose')->name('admin.google.gmail.compose');
-                Route::post('/compose', 'compose')->name('admin.google.gmail.send');
-                Route::get('/sync', 'sync')->name('admin.google.gmail.sync');
-                Route::get('/{messageId}', 'show')->name('admin.google.gmail.show');
-                Route::get('/{messageId}/reply', 'reply')->name('admin.google.gmail.reply');
-                Route::post('/{messageId}/reply', 'reply')->name('admin.google.gmail.send_reply');
-                Route::delete('/{messageId}', 'delete')->name('admin.google.gmail.delete');
+                Route::post('/{accountId}/enable', 'enable')->name('admin.google.gmail.enable');
+                Route::post('/{accountId}/disable', 'disable')->name('admin.google.gmail.disable');
+                Route::post('/{accountId}/test', 'test')->name('admin.google.gmail.test');
             });
         });
     });
